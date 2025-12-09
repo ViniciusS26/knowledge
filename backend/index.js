@@ -1,5 +1,9 @@
 const app = require('express')();
 const consign = require('consign');
+const db = require('./config/db');
+
+app.db = db;
+
 
 
 consign()
@@ -11,3 +15,4 @@ consign()
 app.listen(3000, () => {
     console.log('backend executando...');
 });
+ 
