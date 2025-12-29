@@ -37,7 +37,7 @@ module.exports = app => {
             app.db('users')
                 .update(user)
                 .where({ id: user.id })
-                .then(_ => res.status(204).send())
+                .then(_ => res.status(200).send())
                 .catch(err => res.status(500).send(err));
         } else { // se não existe, realizar o cadastro
             app.db('users')
@@ -56,5 +56,16 @@ module.exports = app => {
 
     }
 
-    return { saveUser };
+    //pega usario pelo id
+    const getUserById = (req, res) => {
+        const id = req.params.id;
+        app.db('users')
+            .select('id', 'name', 'email', 'admin')
+            .where({ id: id })
+            .first()
+            .then(user => res.json(user))
+            .catch(err => res.status(500).send(err));
+    }
+
+    return { saveUser, getUsers, getUserById };
 }
