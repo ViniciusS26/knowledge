@@ -16,4 +16,12 @@ module.exports = app => {
     app.route('/categories/:id')
         .put(app.api.category.saveCategory)
         .get(app.api.category.getCategoryById);
+
+    app.route('/articles')
+        .post(app.api.articles.saveArticles)
+        .get(app.api.articles.getAllArticles)
+
+    app.route('/articles/:id')
+        .post(app.api.articles.saveArticles)
+        .get(app.api.articles.getArticlesById)
 }
