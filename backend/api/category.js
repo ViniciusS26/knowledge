@@ -16,10 +16,11 @@ module.exports = app => {
                 .where({ id: category.id })
                 .then(_ => res.status(200).send())
                 .catch(err => res.status(500).send(err));
+                
         } else { // se não existe, realizar o cadastro
             app.db('categories')
                 .insert(category)
-                .then(_ => res.status(204).send())
+                .then(_ => res.status(200).send())
                 .catch(err => res.status(500).send(err));
         }
     }

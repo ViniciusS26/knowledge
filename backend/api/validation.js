@@ -1,5 +1,5 @@
 // No arquivo validation.js
-module.exports = app => { // Altere de 'export default' para 'module.exports'
+module.exports = app => { 
     function existsOrError(value, msg) {
         if (!value) throw msg;
         if (Array.isArray(value) && value.length === 0) throw msg;
