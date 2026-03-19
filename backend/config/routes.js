@@ -12,6 +12,9 @@ module.exports = app => {
     app.route('/categories')
         .post(app.api.category.saveCategory)
         .get(app.api.category.getCategories);
+    
+    app.route('/categories/tree')
+        .get(app.api.category.getTree)
 
     app.route('/categories/:id')
         .put(app.api.category.saveCategory)
@@ -19,9 +22,10 @@ module.exports = app => {
 
     app.route('/articles')
         .post(app.api.articles.saveArticles)
-        .get(app.api.articles.getAllArticles)
+        .get(app.api.articles.getPage)
 
     app.route('/articles/:id')
-        .post(app.api.articles.saveArticles)
         .get(app.api.articles.getArticlesById)
+        .put(app.api.articles.saveArticles)
+        .delete(app.api.articles.removeArticle)
 }

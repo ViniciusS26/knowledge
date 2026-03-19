@@ -34,11 +34,15 @@ module.exports = app =>{
     }
 
     const getArticlesById = (req, res)=>{
-        const id = req.params.id;
-        app.db('categories')
+
+        app.db('articles')
             .select('id', 'name', 'description','imageUrl','content')
-            .where({id})
-            .then(articles => res.json(articles))
+            .where({id: req.params.id})
+            .first()
+            .then(articles => {
+                articles.content = articles.content.toString()
+                return res.json(articles)
+            })
             .catch(err => res.status(500).send(err));
     }
 
@@ -50,5 +54,32 @@ module.exports = app =>{
             .catch(err => res.status(500).send(err));
 
     }
-    return {saveArticles, getArticlesById, getAllArticles}
+
+
+    const removeArticle =  async(req, res) =>{
+        try{
+            const rowsDelete = await app.db('articles').where({id: req.params.id}).del();
+
+            existsOrError(rowsDelete, 'Artigo não encontrado.');
+            res.status(200).send();
+        }catch(msg){
+            res.status(500).send(msg)
+        }
+    }
+
+    const limit = 10;
+    const getPage = async(req, res)=>{
+        const page = req.query.page || 1
+
+        const result = await app.db('articles').count('id').first()
+        const count = parseInt(result.count)
+
+        app.db('articles')
+            .select('id', 'name', 'description')
+            .limit(limit).offset(page * limit - limit)
+            .then(articles => res.json({data: articles, count, limit }))
+            .catch(err => res.status(500).send(err))
+    }
+
+    return {saveArticles, getArticlesById, getAllArticles, removeArticle, getPage}
 }

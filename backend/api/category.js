@@ -33,13 +33,58 @@ module.exports = app => {
     }
 
     const getCategoryById = (req, res) => {
-        const id = req.params.id;
+
         app.db('categories')
             .select('id', 'name')
-            .where({ id })
+            .where({ id:  req.params.id })
+            .first()
             .then(categories => res.json(categories))
             .catch(err => res.status(500).send(err));
     }
 
-    return { saveCategory, getCategories, getCategoryById };
+    const withPath = categories =>{
+        const getParent = (categories, parentId) =>{
+            const parent = categories.filter(parent => parent.id === parentId)
+            return parent.length ? parent[0] : null
+        }
+
+        const categoriesWithPath = categories.map(category =>{
+            let path = category.name
+            let parent = getParent(categories, category.parentId)
+
+            while(parent){
+                path = `${parent.name} > ${path} `
+                parent = getParent(categories, parent.parentId)
+            }
+
+            return {...category, path}
+        })
+
+        categoriesWithPath.sort((a,b)=>{
+            if(a.path < b.path) return -1
+            if(a.path > b.path) return 1
+            return 0
+        })
+
+        return categoriesWithPath
+    }
+
+    const toTree = (categories, tree) =>{
+        if(!tree) tree = categories.filter(c => !c.parentId)
+        
+        tree = tree.map(parentNode =>{
+            const isChild = node => node.parentId == parentNode.id
+            parentNode.children =  toTree(categories, categories.filter(isChild))
+            return parentNode
+        })
+        return tree
+    }
+
+    const getTree = (req, res) =>{
+        app.db('categories')
+            .then(categories => res.json(toTree(withPath(categories))))
+            .catch(err => res.status(500).send(err))
+    }
+
+    return { saveCategory, getCategories, getCategoryById, getTree};
 }
